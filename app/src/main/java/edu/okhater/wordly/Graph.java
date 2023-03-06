@@ -123,7 +123,6 @@ public class Graph{
             for(String s: successor){
                 if(!ans.contains(s)) {
                     Node found = this.find(s);
-                    found.prev = curr;
                     l.add(found);
                 }
             }
