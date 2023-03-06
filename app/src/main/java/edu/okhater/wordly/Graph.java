@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Objects;
 import java.util.Queue;
 import java.util.Random;
 import java.util.Set;
@@ -96,10 +97,10 @@ public class Graph{
             }
             set.add(curr.name);
             ArrayList<String> successor = this.findSuccessors(curr.name);
-            for(String s: successor){
+            for(String s: Objects.requireNonNull(successor)){
                 if(!set.contains(s)) {
                     Node found = this.find(s);
-                    found.prev = curr;
+                    Objects.requireNonNull(found).prev = curr;
                     q.add(found);
                 }
             }
@@ -113,18 +114,12 @@ public class Graph{
     public ArrayList<String> findRandomWordsPath(){
         Random rand = new Random();
         Node curr = g.get(rand.nextInt(g.size()));
-        ArrayList<Node> l = new ArrayList<>();
-        l.add(curr);
         ArrayList<String> ans = new ArrayList<>();
         for(int i = 0; i < 4; i++){
-            curr = l.remove(rand.nextInt(l.size()));
             ans.add(curr.name);
             ArrayList<String> successor = this.findSuccessors(curr.name);
-            for(String s: successor){
-                if(!ans.contains(s)) {
-                    Node found = this.find(s);
-                    l.add(found);
-                }
+            while(ans.contains(curr.name)){
+                curr = this.find(successor.get(rand.nextInt(successor.size())));
             }
         }
         return ans;
