@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 
 import java.io.BufferedReader;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
@@ -27,12 +26,8 @@ public class MainActivity extends AppCompatActivity {
         }
         try {
             gr = new Graph(reader);
-            for(int i = 0; i < gr.g.size(); i++){
                 //Log.d("CPS", gr.g.get(i).name + "\n" + gr.g.get(i).successors.toString());
-                Log.d("CPS", gr.findPath("weep", "beer").toString());
-            }
-        } catch (FileNotFoundException e) {
-            throw new RuntimeException(e);
+            Log.d("CPS", gr.findRandomWordsPath().toString());
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

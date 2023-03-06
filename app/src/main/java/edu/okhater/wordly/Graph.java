@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.Random;
 import java.util.Set;
 
 public class Graph{
@@ -39,7 +40,7 @@ public class Graph{
     protected  ArrayList<Node> g = new ArrayList<>();
     //Constructor takes in a BufferedReader that already has the file from the assets loaded up (check the main activity)
     public Graph(BufferedReader br) throws IOException {
-        String line = "";
+        String line;
         while((line = br.readLine()) != null){
             if(line.length() == 4){
                 this.add(line);
@@ -48,14 +49,14 @@ public class Graph{
     }
     //Adds to the graph
     private void add(String word){
-        ArrayList<String> succ = new ArrayList<>();
+        ArrayList<String> successor = new ArrayList<>();
         for (Node node : g){
             if(Node.check(node.name, word)){
                 node.successors.add(word);
-                succ.add(node.name);
+                successor.add(node.name);
             }
         }
-        g.add(new Node(word, succ));
+        g.add(new Node(word, successor));
         numNodes += 1;
     }
     //Finds a node of that name, useful in finding a path
@@ -76,6 +77,7 @@ public class Graph{
         return null;
     }
     //Could probably be improved by adding heuristics
+    //For when the user types in their own words
     public ArrayList<String> findPath(String word1, String word2){
         Queue<Node> q = new LinkedList<>();
         Node curr = this.find(word1);
@@ -106,7 +108,28 @@ public class Graph{
         return null;
     }
     //Random generation from one word to another
+    //Just 4 random words
+    //Not sure what to do if there are multiple answers, this only generates one path
     public ArrayList<String> findRandomWordsPath(){
-        return null;
+        Random rand = new Random();
+        Node curr = g.get(rand.nextInt(g.size()));
+        ArrayList<Node> l = new ArrayList<>();
+        l.add(curr);
+        ArrayList<String> ans = new ArrayList<>();
+        for(int i = 0; i < 4; i++){
+            curr = l.remove(rand.nextInt(l.size()));
+            ans.add(curr.name);
+            ArrayList<String> successor = this.findSuccessors(curr.name);
+            for(String s: successor){
+                if(!ans.contains(s)) {
+                    Node found = this.find(s);
+                    found.prev = curr;
+                    l.add(found);
+                }
+            }
+        }
+
+        Collections.reverse(ans);
+        return ans;
     }
 }
