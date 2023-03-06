@@ -128,8 +128,6 @@ public class Graph{
                 }
             }
         }
-
-        Collections.reverse(ans);
         return ans;
     }
 }
