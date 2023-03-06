@@ -114,13 +114,17 @@ public class Graph{
     public ArrayList<String> findRandomWordsPath(){
         Random rand = new Random();
         Node curr = g.get(rand.nextInt(g.size()));
+        //To avoid trivial problems where the solution could be achieved in less than 4 steps
+        ArrayList<String> otherSuccessors = new ArrayList<>();
         ArrayList<String> ans = new ArrayList<>();
         for(int i = 0; i < 4; i++){
             ans.add(curr.name);
+            otherSuccessors.add(curr.name);
             ArrayList<String> successor = this.findSuccessors(curr.name);
-            while(ans.contains(curr.name)){
+            while(ans.contains(curr.name) && otherSuccessors.contains(curr.name)){
                 curr = this.find(successor.get(rand.nextInt(successor.size())));
             }
+            otherSuccessors.addAll(successor);
         }
         return ans;
     }
