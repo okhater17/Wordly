@@ -4,8 +4,10 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 
@@ -14,7 +16,6 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 
 public class MainActivity extends AppCompatActivity {
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -33,12 +34,27 @@ public class MainActivity extends AppCompatActivity {
             actionBar.hide();
         }
 
+
+
         Handler handler = new Handler();
         handler.postDelayed(new Runnable() {
             @Override
             public void run() {
-                Intent i = new Intent(getApplicationContext(), StartActivity.class);
-                startActivity(i);
+                // help with shared preferences https://www.digitalocean.com/community/tutorials/android-shared-preferences-example-tutorial
+                SharedPreferences sharedPreferences = getApplicationContext().getSharedPreferences("firstLaunchPreference", 0);
+                SharedPreferences.Editor editor = sharedPreferences.edit();
+                // if first launch
+                if (!sharedPreferences.contains("firstLaunch")) {
+                    editor.putBoolean("firstLaunch", true);
+                    editor.commit();
+                    Intent i = new Intent(getApplicationContext(), FirstLaunchActivity.class);
+                    startActivity(i);
+                }
+                // if not first launch go to game
+                else {
+                    Intent i = new Intent(getApplicationContext(), StartActivity.class);
+                    startActivity(i);
+                }
             }
         }, 1375);
     }
