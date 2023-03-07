@@ -61,7 +61,7 @@ public class Graph{
         numNodes += 1;
     }
     //Finds a node of that name, useful in finding a path
-    private Node find(String name){
+    public Node find(String name){
         for(Node node: g){
             if(node.name.equals(name)){
                 return node;
