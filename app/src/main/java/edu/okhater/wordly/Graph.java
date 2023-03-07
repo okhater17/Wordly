@@ -61,7 +61,7 @@ public class Graph{
         numNodes += 1;
     }
     //Finds a node of that name, useful in finding a path
-    public Node find(String name){
+    private Node find(String name){
         for(Node node: g){
             if(node.name.equals(name)){
                 return node;
@@ -80,33 +80,38 @@ public class Graph{
     //Could probably be improved by adding heuristics
     //For when the user types in their own words
     public ArrayList<String> findPath(String word1, String word2){
-        Queue<Node> q = new LinkedList<>();
-        Node curr = this.find(word1);
-        q.add(curr);
-        Set<String> set = new HashSet<>();
-        while(!q.isEmpty()){
-            curr = q.remove();
-            if(curr.name.equals(word2)){
-                ArrayList<String> ans = new ArrayList<>();
-                while(curr != null){
-                    ans.add(curr.name);
-                    curr = curr.prev;
+        try {
+            Queue<Node> q = new LinkedList<>();
+            Node curr = this.find(word1);
+            q.add(curr);
+            Set<String> set = new HashSet<>();
+            while (!q.isEmpty()) {
+                curr = q.remove();
+                if (curr.name.equals(word2)) {
+                    ArrayList<String> ans = new ArrayList<>();
+                    while (curr != null) {
+                        ans.add(curr.name);
+                        curr = curr.prev;
+                    }
+                    Collections.reverse(ans);
+                    return ans;
                 }
-                Collections.reverse(ans);
-                return ans;
-            }
-            set.add(curr.name);
-            ArrayList<String> successor = this.findSuccessors(curr.name);
-            for(String s: Objects.requireNonNull(successor)){
-                if(!set.contains(s)) {
-                    Node found = this.find(s);
-                    Objects.requireNonNull(found).prev = curr;
-                    q.add(found);
+                set.add(curr.name);
+                ArrayList<String> successor = this.findSuccessors(curr.name);
+                for (String s : Objects.requireNonNull(successor)) {
+                    if (!set.contains(s)) {
+                        Node found = this.find(s);
+                        Objects.requireNonNull(found).prev = curr;
+                        q.add(found);
+                    }
                 }
             }
+            //Couldn't find path; possible. Not sure how to handle yet.
+            return null;
         }
-        //Couldn't find path; possible. Not sure how to handle yet.
-        return null;
+        catch (NullPointerException e){
+            return null;
+        }
     }
     //Random generation from one word to another
     //Just 4 random words
