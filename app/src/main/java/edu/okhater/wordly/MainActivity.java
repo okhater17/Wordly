@@ -27,7 +27,9 @@ public class MainActivity extends AppCompatActivity {
         try {
             gr = new Graph(reader);
             //Log.d("CPS", gr.g.get(i).name + "\n" + gr.g.get(i).successors.toString());
-            Log.d("CPS", gr.findRandomWordsPath().toString());
+            for(int i = 0; i < 10; i++) {
+                Log.d("CPS", gr.findRandomWordsPath().toString());
+            }
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
