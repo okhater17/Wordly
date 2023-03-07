@@ -2,17 +2,59 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/root_cl_first_launch"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".FirstLaunchActivity">
 
     <ImageView
+        android:id="@+id/wordly_image"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/wordly_image"
+        app:layout_constraintBottom_toTopOf="@id/demo_image"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
+
+    <ImageView
+        android:id="@+id/demo_image"
         android:layout_width="315dp"
         android:layout_height="356dp"
         android:src="@drawable/explanation_image"
-
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias=".4"/>
+
+    <TextView
+        android:id="@+id/explanation_text"
+        android:layout_width="315dp"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:textAlignment="center"
+        android:text="Transform the word on the left to the word on the right by changing one letter at a time."
+        app:layout_constraintTop_toBottomOf="@+id/demo_image"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_bias=".3"
+        />
+
+    <TextView
+        android:id="@+id/begin_text"
+        android:layout_width="315dp"
+        android:layout_height="wrap_content"
+        android:textSize="20dp"
+        android:textAlignment="center"
+        android:text="Click anywhere to start playing!"
+        app:layout_constraintTop_toBottomOf="@+id/explanation_text"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        />
+
+
 </androidx.constraintlayout.widget.ConstraintLayout>

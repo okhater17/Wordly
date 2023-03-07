@@ -21,7 +21,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        View rootView = findViewById(R.id.root_cl);
+        View rootView = findViewById(R.id.root_cl_main);
 
         rootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE
             | View.SYSTEM_UI_FLAG_FULLSCREEN
