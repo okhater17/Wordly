@@ -81,6 +81,10 @@ public class StartActivity extends AppCompatActivity {
             EditText word2 = findViewById(R.id.word2);
             String word1Str = word1.getText().toString();
             String word2Str = word2.getText().toString();
+            if(gr.find(word1Str) == null || gr.find(word2Str) == null){
+                Toast.makeText(getApplicationContext(), "Words not supported!", Toast.LENGTH_SHORT).show();
+                return;
+            }
             if(word1Str.length() != word2Str.length()){
                 Toast.makeText(getApplicationContext(), "Enter two words of the same length!", Toast.LENGTH_SHORT).show();
             }
