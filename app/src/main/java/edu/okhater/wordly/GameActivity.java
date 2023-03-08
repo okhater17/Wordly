@@ -211,7 +211,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     HttpsURLConnection con = null;
                     Bitmap img = null;
                     try {
-                        // help with pixabyhttps://www.youtube.com/watch?v=iOd86bj41hs
+                        // help with pixaby https://www.youtube.com/watch?v=iOd86bj41hs
                         URL url = new URL("https://pixabay.com/api/?key=34235580-57f7f2b3914a36555e74d2720&q=" + searchWord +"&image_type=photo&pretty=true");
 
                         // get info from pixaby
