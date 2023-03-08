@@ -81,14 +81,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                 if(path.get(position).equals(input.getText().toString().toLowerCase())){
                     guess.set(position, path.get(position));
                     adapter.notifyDataSetChanged();
-
-                    Boolean all_guesses_correct = true;
-                    for (int i = 0; i < path.size(); i++) {
-                        if (!path.get(i).equals(guess.get(i).toLowerCase())) {
-                            all_guesses_correct = false;
-                        }
-                    }
-                    if (all_guesses_correct) {
+                    if (path.equals(guess)) {
                         userWin = true;
                         ImageView winStar = (ImageView) findViewById(R.id.win_star);
                         winStar.setVisibility(View.VISIBLE);
