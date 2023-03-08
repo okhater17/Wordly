@@ -28,10 +28,14 @@ public class StartActivity extends AppCompatActivity {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
-                    if(s != null) {
+                    // there is a path and it is not just the start and end word
+                    if(s != null && s.size() > 2) {
                         Intent i = new Intent(getApplicationContext(), GameActivity.class);
                         i.putExtra("path", s);
                         startActivity(i);
+                    }
+                    else if(s != null && s.size() == 2) {
+                        Toast.makeText(getApplicationContext(), "Words too similar!!", Toast.LENGTH_SHORT).show();
                     }
                     else{
                         Toast.makeText(getApplicationContext(), "Words not supported!", Toast.LENGTH_SHORT).show();
