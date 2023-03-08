@@ -15,6 +15,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.RelativeLayout;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -49,6 +50,16 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
         adapter = new RecycleViewAdapter(this, guess);
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
+
+        View rl = findViewById(R.id.rl_root);
+        rl.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (userWin) {
+                    finish();
+                }
+            }
+        });
     }
     @Override
     public void onItemClick(View view, int position) {
@@ -77,12 +88,12 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                         }
                     }
                     if (all_guesses_correct) {
+                        userWin = true;
                         ImageView winStar = (ImageView) findViewById(R.id.win_star);
                         winStar.setVisibility(View.VISIBLE);
                         Animation fade = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim);
                         winStar.setAnimation(fade);
                         winStar.animate();
-
 
                         Toast.makeText(getApplicationContext(), "You Win!", Toast.LENGTH_SHORT).show();
                     }
