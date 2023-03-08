@@ -63,19 +63,21 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
         hintButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                int idx = 0;
-                for (int i = 0; i < path.size(); i++) {
-                    if (!path.get(i).equals(guess.get(i).toLowerCase())) {
-                        idx = i;
+                // find first box not answered
+                for (int wordIdx = 0; wordIdx < path.size(); wordIdx++) {
+                    if (!path.get(wordIdx).equals(guess.get(wordIdx).toLowerCase())) {
+                        // find the different character
+                        for (int charIdx = 0; charIdx < path.get(wordIdx).length(); charIdx++) {
+                            // compare current word to word before it
+                            if (path.get(wordIdx).charAt(charIdx) != path.get(wordIdx - 1).charAt(charIdx)) {
+                                Toast.makeText(getApplicationContext(), String.valueOf(path.get(wordIdx).charAt(charIdx)), Toast.LENGTH_SHORT).show();
+                                break;
+                            }
+                        }
                         break;
                     }
                 }
-                for (int i = 0; i < path.get(idx).length(); i++) {
-                    if (path.get(idx).charAt(i) != path.get(idx - 1).charAt(i)) {
-                        Toast.makeText(getApplicationContext(), String.valueOf(path.get(idx).charAt(i)), Toast.LENGTH_SHORT).show();
-                        break;
-                    }
-                }
+
             }
         });
 
