@@ -33,5 +33,16 @@
         android:src="@drawable/star"
         android:visibility="invisible" />
 
+    <Button
+        android:id="@+id/hint_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginBottom="20dp"
+        android:layout_marginRight="20dp"
+        android:text="Hint"
+        android:textSize="20dp"/>
+
 
 </RelativeLayout>

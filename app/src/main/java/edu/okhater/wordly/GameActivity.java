@@ -13,6 +13,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
@@ -57,6 +58,27 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                 }
             }
         });
+
+        Button hintButton = (Button) findViewById(R.id.hint_button);
+        hintButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                int idx = 0;
+                for (int i = 0; i < path.size(); i++) {
+                    if (!path.get(i).equals(guess.get(i).toLowerCase())) {
+                        idx = i;
+                        break;
+                    }
+                }
+                for (int i = 0; i < path.get(idx).length(); i++) {
+                    if (path.get(idx).charAt(i) != path.get(idx - 1).charAt(i)) {
+                        Toast.makeText(getApplicationContext(), String.valueOf(path.get(idx).charAt(i)), Toast.LENGTH_SHORT).show();
+                        break;
+                    }
+                }
+            }
+        });
+
     }
     @Override
     public void onItemClick(View view, int position) {
