@@ -20,6 +20,7 @@ public class FirstLaunchActivity extends AppCompatActivity {
             public void onClick(View view) {
                 Intent i = new Intent(getApplicationContext(), StartActivity.class);
                 startActivity(i);
+                finish();
             }
         });
     }
