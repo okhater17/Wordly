@@ -56,7 +56,7 @@ public class RecycleViewAdapter extends RecyclerView.Adapter<RecycleViewAdapter.
 
         @Override
         public void onClick(View view) {
-            if (mClickListener != null) mClickListener.onItemClick(view, getAdapterPosition());
+            if (mClickListener != null && getAdapterPosition() != 0 && getAdapterPosition() != path.size()-1) mClickListener.onItemClick(view, getAdapterPosition());
         }
     }
 
