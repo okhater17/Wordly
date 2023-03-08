@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set xmlns:android="http://schemas.android.com/apk/res/android"
+    android:fillAfter="true">
+    <alpha
+        android:fromAlpha="1.0"
+        android:toAlpha="0.0"
+        android:duration="750"
+        android:repeatMode="reverse"
+        android:repeatCount="infinite" />
+    <!--change size https://stackoverflow.com/questions/33916287/android-scale-image-view-with-animation-->
+    <scale
+        android:fromXScale="-2.0"
+        android:fromYScale="-2.0"
+
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:toXScale="1"
+        android:toYScale="1"
+        android:duration="1500" />
+
+    <!--    rotate https://stackoverflow.com/questions/1634252/how-to-make-a-smooth-image-rotation-in-android-->
+    <rotate xmlns:android="http://schemas.android.com/apk/res/android"
+        android:duration="1600"
+        android:fromDegrees="0"
+        android:interpolator="@android:anim/linear_interpolator"
+        android:pivotX="50%"
+        android:pivotY="50%"
+        android:repeatCount="infinite"
+        android:toDegrees="358" />
+</set>

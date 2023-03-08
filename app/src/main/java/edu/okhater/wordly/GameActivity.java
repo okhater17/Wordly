@@ -11,7 +11,10 @@ import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -20,6 +23,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
     ArrayList<String> path;
     ArrayList<String> guess;
     RecycleViewAdapter adapter;
+    Boolean userWin = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,6 +70,22 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     guess.set(position, path.get(position));
                     adapter.notifyDataSetChanged();
 
+                    Boolean all_guesses_correct = true;
+                    for (int i = 0; i < path.size(); i++) {
+                        if (!path.get(i).equals(guess.get(i).toLowerCase())) {
+                            all_guesses_correct = false;
+                        }
+                    }
+                    if (all_guesses_correct) {
+                        ImageView winStar = (ImageView) findViewById(R.id.win_star);
+                        winStar.setVisibility(View.VISIBLE);
+                        Animation fade = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim);
+                        winStar.setAnimation(fade);
+                        winStar.animate();
+
+
+                        Toast.makeText(getApplicationContext(), "You Win!", Toast.LENGTH_SHORT).show();
+                    }
                 }
                 else{
                     Toast.makeText(getApplicationContext(), "Wrong word!", Toast.LENGTH_SHORT).show();
