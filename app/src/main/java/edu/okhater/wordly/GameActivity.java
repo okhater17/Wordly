@@ -60,6 +60,11 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
     }
     @Override
     public void onItemClick(View view, int position) {
+        if (userWin) {
+            finish();
+            return;
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Guess!");
 
