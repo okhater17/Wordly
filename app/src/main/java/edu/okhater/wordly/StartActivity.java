@@ -35,7 +35,7 @@ public class StartActivity extends AppCompatActivity {
                         startActivity(i);
                     }
                     else if(s != null && s.size() == 2) {
-                        Toast.makeText(getApplicationContext(), "Words too similar!!", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(getApplicationContext(), "Words too similar!", Toast.LENGTH_SHORT).show();
                     }
                     else{
                         Toast.makeText(getApplicationContext(), "Words not supported!", Toast.LENGTH_SHORT).show();
