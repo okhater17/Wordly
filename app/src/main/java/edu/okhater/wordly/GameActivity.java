@@ -1,5 +1,6 @@
 package edu.okhater.wordly;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -35,6 +36,7 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.sql.Array;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -45,7 +47,8 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
     ArrayList<String> path;
     ArrayList<String> guess;
     RecycleViewAdapter adapter;
-    Boolean userWin = false;
+    boolean userWin = false;
+    int currentGuessPosition;
     HintImageExecutor hie = new HintImageExecutor();
 
     interface HintImageCallback {
@@ -80,18 +83,40 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                 = new LinearLayoutManager(GameActivity.this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(horizontalLayoutManager);
 
-        guess = new ArrayList<>(Collections.nCopies(path.size(), ""));
-        guess.set(0, path.get(0));
-        guess.set(guess.size() - 1, path.get(path.size() - 1));
-        adapter = new RecycleViewAdapter(this, guess);
-        adapter.setClickListener(this);
-        recyclerView.setAdapter(adapter);
+        // if rotated this will preserve game state
+        if (savedInstanceState != null) {
+            guess = savedInstanceState.getStringArrayList("path");
 
+            boolean win = true;
+            for (int j = 0; j < guess.size(); j++) {
+                if (guess.get(j).equals("")) {
+                    win = false;
+                    currentGuessPosition = j;
+                }
+            }
+            // if user rotated screen after winning end activity (this is what Professor Novak's does)
+            if (!win) {
+                adapter = new RecycleViewAdapter(this, guess);
+                adapter.setClickListener(this);
+                recyclerView.setAdapter(adapter);
+            }
+            else {
+                finish();
+            }
+        }
+        else {
+            guess = new ArrayList<>(Collections.nCopies(path.size(), ""));
+            guess.set(0, path.get(0));
+            guess.set(guess.size() - 1, path.get(path.size() - 1));
+            adapter = new RecycleViewAdapter(this, guess);
+            adapter.setClickListener(this);
+            recyclerView.setAdapter(adapter);
+            currentGuessPosition = 1;
+        }
         // using math for now as a test
-        hie.fetch(hic, path.get(1));
+        hie.fetch(hic, path.get(currentGuessPosition));
 
-        View rl = findViewById(R.id.rl_root);
-        rl.setOnClickListener(new View.OnClickListener() {
+        rootView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 if (userWin) {
@@ -245,9 +270,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                         byte[] response = out.toByteArray();
                         img = BitmapFactory.decodeByteArray(response, 0, response.length);
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (JSONException e) {
+                    } catch (IOException | JSONException e) {
                         e.printStackTrace();
                     }
 
@@ -255,5 +278,17 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                 }
             });
         }
+    }
+
+    // save the current guesses when rotated https://stackoverflow.com/questions/16692536/good-solution-to-retain-listview-items-when-user-rotate-phone-and-keep-all-data
+    @Override
+    public void onSaveInstanceState(@NonNull Bundle savedState) {
+
+        super.onSaveInstanceState(savedState);
+
+        // Note: getValues() is a method in your ArrayAdapter subclass
+        ArrayList<String> values = guess;
+        savedState.putStringArrayList("path", values);
+
     }
 }
