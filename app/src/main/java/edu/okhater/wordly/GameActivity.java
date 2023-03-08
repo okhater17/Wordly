@@ -18,6 +18,7 @@ import android.widget.ImageView;
 import android.widget.Toast;
 
 import java.util.ArrayList;
+import java.util.Collections;
 
 public class GameActivity extends AppCompatActivity implements RecycleViewAdapter.ItemClickListener{
     ArrayList<String> path;
@@ -38,14 +39,10 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
         LinearLayoutManager horizontalLayoutManager
                 = new LinearLayoutManager(GameActivity.this, LinearLayoutManager.HORIZONTAL, false);
         recyclerView.setLayoutManager(horizontalLayoutManager);
-        guess = new ArrayList<String>() {
-            {
-                add(path.get(0));
-                add("");
-                add("");
-                add(path.get(path.size() - 1));
-            }
-        };
+
+        guess = new ArrayList<>(Collections.nCopies(path.size(), ""));
+        guess.set(0, path.get(0));
+        guess.set(guess.size() - 1, path.get(path.size() - 1));
         adapter = new RecycleViewAdapter(this, guess);
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
@@ -53,7 +50,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
     @Override
     public void onItemClick(View view, int position) {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Title");
+        builder.setTitle("Guess!");
 
 // Set up the input
         final EditText input = new EditText(this);
@@ -66,7 +63,6 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(path.get(position).equals(input.getText().toString().toLowerCase())){
-                    Log.d("CPS", "HEY");
                     guess.set(position, path.get(position));
                     adapter.notifyDataSetChanged();
 
