@@ -1,5 +1,6 @@
 package edu.okhater.wordly;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -21,21 +22,31 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.BufferedInputStream;
+import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
+import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+
+import javax.net.ssl.HttpsURLConnection;
 
 public class GameActivity extends AppCompatActivity implements RecycleViewAdapter.ItemClickListener{
     ArrayList<String> path;
     ArrayList<String> guess;
     RecycleViewAdapter adapter;
     Boolean userWin = false;
+    HintImageExecutor hie = new HintImageExecutor();
 
     interface HintImageCallback {
         void onComplete(Bitmap img);
@@ -45,6 +56,20 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
+
+        View rootView = findViewById(R.id.rl_root);
+
+        rootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE
+                | View.SYSTEM_UI_FLAG_FULLSCREEN
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.hide();
+        }
+
         Intent i = getIntent();
         if(i != null) {
             path = (ArrayList<String>) i.getSerializableExtra("path");
@@ -62,9 +87,8 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
-        HintImageExecutor hie = new HintImageExecutor();
         // using math for now as a test
-        hie.fetch(hic, "math");
+        hie.fetch(hic, path.get(1));
 
         View rl = findViewById(R.id.rl_root);
         rl.setOnClickListener(new View.OnClickListener() {
@@ -123,6 +147,9 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(path.get(position).equals(input.getText().toString().toLowerCase())){
+                    // update image
+                    hie.fetch(hic, path.get(position + 1));
+
                     guess.set(position, path.get(position));
                     adapter.notifyDataSetChanged();
 
@@ -134,6 +161,9 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     }
                     if (all_guesses_correct) {
                         userWin = true;
+                        ImageView hintImage = (ImageView) findViewById(R.id.hint_image);
+                        hintImage.setVisibility(View.INVISIBLE);
+                        
                         ImageView winStar = (ImageView) findViewById(R.id.win_star);
                         winStar.setVisibility(View.VISIBLE);
                         Animation fade = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim);
@@ -178,36 +208,57 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
     };
 
     public class HintImageExecutor {
-        public void fetch(HintImageCallback hic, String word) {
+        public void fetch(HintImageCallback hic, String searchWord) {
             ExecutorService es = Executors.newFixedThreadPool(1);
             es.execute(new Runnable() {
 
                 @Override
                 public void run() {
 
+                    HttpsURLConnection con = null;
                     Bitmap img = null;
                     try {
-                        URL url = new URL("https://images5.alphacoders.com/408/408941.jpg");
-                        InputStream in = new BufferedInputStream(url.openStream());
-                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+                        // help with pixabyhttps://www.youtube.com/watch?v=iOd86bj41hs
+                        URL url = new URL("https://pixabay.com/api/?key=34235580-57f7f2b3914a36555e74d2720&q=" + searchWord +"&image_type=photo&pretty=true");
 
+                        // get info from pixaby
+                        con = (HttpsURLConnection) url.openConnection();
+                        con.setRequestMethod("GET");
+                        con.connect();
+                        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+                        StringBuffer data = new StringBuffer();
+                        String curLine;
+                        while ((curLine = in.readLine()) != null) {
+                            data.append(curLine);
+                        }
+
+                        // get image url
+                        JSONObject jsonImages = new JSONObject(data.toString());
+                        JSONArray jsonArray = jsonImages.getJSONArray("hits");
+                        JSONObject jsonObject = jsonArray.getJSONObject(0);
+                        URL imageUrl = new URL((String) jsonObject.getString("previewURL"));
+
+                        // convert to image
+                        InputStream inStream = new BufferedInputStream(imageUrl.openStream());
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
                         byte[] buf = new byte[1024];
                         int n = 0;
-                        while (-1 != (n= in.read(buf))) {
+                        while (-1 != (n= inStream.read(buf))) {
                             out.write(buf, 0, n);
                         }
                         out.close();
-                        in.close();
+                        inStream.close();
 
                         byte[] response = out.toByteArray();
                         img = BitmapFactory.decodeByteArray(response, 0, response.length);
 
                     } catch (IOException e) {
                         e.printStackTrace();
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
 
                     hic.onComplete(img);
-
                 }
             });
         }
