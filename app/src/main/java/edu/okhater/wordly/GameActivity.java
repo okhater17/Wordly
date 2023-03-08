@@ -7,25 +7,39 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 
+import java.io.BufferedInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class GameActivity extends AppCompatActivity implements RecycleViewAdapter.ItemClickListener{
     ArrayList<String> path;
     ArrayList<String> guess;
     RecycleViewAdapter adapter;
     Boolean userWin = false;
+
+    interface HintImageCallback {
+        void onComplete(Bitmap img);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +62,10 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
         adapter.setClickListener(this);
         recyclerView.setAdapter(adapter);
 
+        HintImageExecutor hie = new HintImageExecutor();
+        // using math for now as a test
+        hie.fetch(hic, "math");
+
         View rl = findViewById(R.id.rl_root);
         rl.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -57,6 +75,32 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                 }
             }
         });
+
+        Button hintButton = (Button) findViewById(R.id.hint_button);
+        hintButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (userWin) {
+                    finish();
+                }
+                // find first box not answered
+                for (int wordIdx = 0; wordIdx < path.size(); wordIdx++) {
+                    if (!path.get(wordIdx).equals(guess.get(wordIdx).toLowerCase())) {
+                        // find the different character
+                        for (int charIdx = 0; charIdx < path.get(wordIdx).length(); charIdx++) {
+                            // compare current word to word before it
+                            if (path.get(wordIdx).charAt(charIdx) != path.get(wordIdx - 1).charAt(charIdx)) {
+                                Toast.makeText(getApplicationContext(), String.valueOf(path.get(wordIdx).charAt(charIdx)), Toast.LENGTH_SHORT).show();
+                                break;
+                            }
+                        }
+                        break;
+                    }
+                }
+
+            }
+        });
+
     }
     @Override
     public void onItemClick(View view, int position) {
@@ -106,5 +150,59 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
 
         builder.show();
 
+    }
+
+    HintImageCallback hic = new HintImageCallback() {
+        @Override
+        public void onComplete(Bitmap img) {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    if (img != null) {
+                        ImageView iv = (ImageView) findViewById(R.id.hint_image);
+                        iv.setImageBitmap(img);
+                    }
+                    else {
+                        Toast.makeText(getApplicationContext(), "Failed to download hint image :(", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            });
+        }
+    };
+
+    public class HintImageExecutor {
+        public void fetch(HintImageCallback hic, String word) {
+            ExecutorService es = Executors.newFixedThreadPool(1);
+            es.execute(new Runnable() {
+
+                @Override
+                public void run() {
+
+                    Bitmap img = null;
+                    try {
+                        URL url = new URL("https://images5.alphacoders.com/408/408941.jpg");
+                        InputStream in = new BufferedInputStream(url.openStream());
+                        ByteArrayOutputStream out = new ByteArrayOutputStream();
+
+                        byte[] buf = new byte[1024];
+                        int n = 0;
+                        while (-1 != (n= in.read(buf))) {
+                            out.write(buf, 0, n);
+                        }
+                        out.close();
+                        in.close();
+
+                        byte[] response = out.toByteArray();
+                        img = BitmapFactory.decodeByteArray(response, 0, response.length);
+
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+
+                    hic.onComplete(img);
+
+                }
+            });
+        }
     }
 }
