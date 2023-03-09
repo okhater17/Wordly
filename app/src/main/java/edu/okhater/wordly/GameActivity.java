@@ -12,6 +12,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.Image;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
@@ -54,10 +55,15 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
     boolean userWin = false;
     int currentGuessPosition;
     View rootView;
+    ArrayList<Bitmap> imageList = new ArrayList<>();
     HintImageExecutor hie = new HintImageExecutor();
 
     interface HintImageCallback {
         void onComplete(Bitmap img);
+    }
+
+    interface CycleImageCallback {
+        void onComplete();
     }
 
     @Override
@@ -140,7 +146,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     finish();
                 }
                 // find first box not answered
-                for (int wordIdx = 0; wordIdx < path.size(); wordIdx++) {
+                for (int wordIdx = 1; wordIdx < path.size(); wordIdx++) {
                     if (!path.get(wordIdx).equals(guess.get(wordIdx).toLowerCase())) {
                         // find the different character
                         for (int charIdx = 0; charIdx < path.get(wordIdx).length(); charIdx++) {
@@ -321,7 +327,118 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
             });
         }
     }
+//    HintImageCallback hic = new HintImageCallback() {
+//        @Override
+//        public void onComplete() {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    ImageView hintImage = (ImageView) findViewById(R.id.hint_image);
+//                    if (imageList.size() != 0) {
+//                        CycleImageExecutor cie = new CycleImageExecutor();
+//                        cie.cycleImages(cic);
+//                    }
+//                    else {
+//                        hintImage.setImageResource(R.drawable.unable_to_fetch_image);
+//                        Toast.makeText(getApplicationContext(), "Failed to download hint image :(", Toast.LENGTH_SHORT).show();
+//                    }
+//
+//                }
+//            });
+//        }
+//    };
 
+//    CycleImageCallback cic = new CycleImageCallback() {
+//        @Override
+//        public void onComplete() {
+//            runOnUiThread(new Runnable() {
+//                @Override
+//                public void run() {
+//                    ImageView hintImage = (ImageView) findViewById(R.id.hint_image);
+//                    for (int i = 0; i < imageList.size(); i++) {
+//                        hintImage.setImageBitmap(imageList.get(i));
+//                        try {
+//                            Thread.sleep(1000);
+//                        } catch (InterruptedException e) {
+//                            throw new RuntimeException(e);
+//                        }
+//                    }
+//                }
+//            });
+//        }
+//    };
+
+//    public class HintImageExecutor {
+//        public void fetch(HintImageCallback hic, String searchWord) {
+//            ExecutorService es = Executors.newFixedThreadPool(1);
+//            es.execute(new Runnable() {
+//
+//                @Override
+//                public void run() {
+//
+//                    HttpsURLConnection con = null;
+//                    Bitmap img = null;
+//                    try {
+//                        ImageView iv = (ImageView) findViewById(R.id.hint_image);
+//                        iv.setImageResource(R.drawable.fetching_image);
+//                        // help with pixaby https://www.youtube.com/watch?v=iOd86bj41hs
+//                        Log.d("Search Word", searchWord);
+//                        URL url = new URL("https://pixabay.com/api/?key=34235580-57f7f2b3914a36555e74d2720&q=" + searchWord +"&image_type=photo&pretty=true");
+//
+//                        // get info from pixaby
+//                        con = (HttpsURLConnection) url.openConnection();
+//                        con.setRequestMethod("GET");
+//                        con.connect();
+//                        BufferedReader in = new BufferedReader(new InputStreamReader(url.openStream()));
+//                        StringBuffer data = new StringBuffer();
+//                        String curLine;
+//                        while ((curLine = in.readLine()) != null) {
+//                            data.append(curLine);
+//                        }
+//
+//                        for (int i = 0; i < 5; i++) {
+//                            // get image url
+//                            JSONObject jsonImages = new JSONObject(data.toString());
+//                            JSONArray jsonArray = jsonImages.getJSONArray("hits");
+//                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+//                            URL imageUrl = new URL((String) jsonObject.getString("previewURL"));
+//
+//                            // convert to image
+//                            InputStream inStream = new BufferedInputStream(imageUrl.openStream());
+//                            ByteArrayOutputStream out = new ByteArrayOutputStream();
+//                            byte[] buf = new byte[1024];
+//                            int n = 0;
+//                            while (-1 != (n = inStream.read(buf))) {
+//                                out.write(buf, 0, n);
+//                            }
+//                            out.close();
+//                            inStream.close();
+//
+//                            byte[] response = out.toByteArray();
+//                            imageList.add(BitmapFactory.decodeByteArray(response, 0, response.length));
+//                        }
+//
+//                    } catch (IOException | JSONException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    hic.onComplete();
+//                }
+//            });
+//        }
+//    }
+
+//    public class CycleImageExecutor {
+//        public void cycleImages(CycleImageCallback cic) {
+//            ExecutorService es = Executors.newFixedThreadPool(1);
+//            es.execute(new Runnable() {
+//                @Override
+//                public void run() {
+//                    cic.onComplete();
+//                }
+//            });
+//        }
+//    }
     // save the current guesses when rotated https://stackoverflow.com/questions/16692536/good-solution-to-retain-listview-items-when-user-rotate-phone-and-keep-all-data
     @Override
     public void onSaveInstanceState(@NonNull Bundle savedState) {

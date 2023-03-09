@@ -81,7 +81,7 @@ public class StartActivity extends AppCompatActivity {
         setContentView(R.layout.activity_start);
         try {
             reader = new BufferedReader(
-                    new InputStreamReader(getAssets().open("words_gwicks.txt")));
+                    new InputStreamReader(getAssets().open("words_unix.txt")));
             gr = new Graph(reader);
         } catch (IOException e) {
             throw new RuntimeException(e);
