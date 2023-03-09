@@ -98,6 +98,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                 if (guess.get(j).equals("")) {
                     win = false;
                     currentGuessPosition = j;
+                    break;
                 }
             }
             // if user rotated screen after winning end activity (this is what Professor Novak's does)
@@ -277,6 +278,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                         ImageView iv = (ImageView) findViewById(R.id.hint_image);
                         iv.setImageResource(R.drawable.fetching_image);
                         // help with pixaby https://www.youtube.com/watch?v=iOd86bj41hs
+                        Log.d("Search Word", searchWord);
                         URL url = new URL("https://pixabay.com/api/?key=34235580-57f7f2b3914a36555e74d2720&q=" + searchWord +"&image_type=photo&pretty=true");
 
                         // get info from pixaby
