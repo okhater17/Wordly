@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.content.Intent;
 import android.os.Bundle;
 
+import android.os.SystemClock;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -18,6 +19,7 @@ import java.util.concurrent.Executors;
 
 public class StartActivity extends AppCompatActivity {
     BufferedReader reader;
+    long lastClickTime = 0;
     Graph gr;
     interface GraphCallBack{
         void onComplete(ArrayList<String> s);
@@ -80,7 +82,13 @@ public class StartActivity extends AppCompatActivity {
             throw new RuntimeException(e);
         }
 
+        // prevent double clicking play game button https://stackoverflow.com/questions/5608720/android-preventing-double-click-on-a-button
         findViewById(R.id.play).setOnClickListener(view -> {
+            if (SystemClock.elapsedRealtime() - lastClickTime < 1000){
+                return;
+            }
+            lastClickTime = SystemClock.elapsedRealtime();
+
             EditText word1 = findViewById(R.id.word1);
             EditText word2 = findViewById(R.id.word2);
             String word1Str = word1.getText().toString();
@@ -98,6 +106,10 @@ public class StartActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.random).setOnClickListener(view -> {
+            if (SystemClock.elapsedRealtime() - lastClickTime < 1000){
+                return;
+            }
+            lastClickTime = SystemClock.elapsedRealtime();
             new GraphExecutor().findRandomPath(gcb);
         });
 
