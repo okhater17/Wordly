@@ -30,8 +30,20 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.178" />
 
+    <TextView
+        android:id="@+id/path_tv_working"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Making Game"
+        android:visibility="invisible"
+        app:layout_constraintTop_toBottomOf="@id/word1"
+        app:layout_constraintBottom_toTopOf="@id/play_custom"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintVertical_bias=".8"/>
+
     <Button
-        android:id="@+id/play"
+        android:id="@+id/play_custom"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Play custom game"
@@ -42,14 +54,14 @@
         app:layout_constraintVertical_bias="0.319" />
 
     <Button
-        android:id="@+id/random"
+        android:id="@+id/play_random"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Play random game"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/play"
+        app:layout_constraintTop_toBottomOf="@id/play_custom"
         app:layout_constraintVertical_bias="0.095" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

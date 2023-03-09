@@ -6,6 +6,9 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import android.os.SystemClock;
+import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -42,6 +45,7 @@ public class StartActivity extends AppCompatActivity {
                     else{
                         Toast.makeText(getApplicationContext(), "Words not supported!", Toast.LENGTH_SHORT).show();
                     }
+                    showWorking(false);
                 }
             });
 
@@ -70,24 +74,26 @@ public class StartActivity extends AppCompatActivity {
             });
         }
     }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
         try {
             reader = new BufferedReader(
-                    new InputStreamReader(getAssets().open("words_test.txt")));
+                    new InputStreamReader(getAssets().open("words_gwicks.txt")));
             gr = new Graph(reader);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
         // prevent double clicking play game button https://stackoverflow.com/questions/5608720/android-preventing-double-click-on-a-button
-        findViewById(R.id.play).setOnClickListener(view -> {
+        findViewById(R.id.play_custom).setOnClickListener(view -> {
             if (SystemClock.elapsedRealtime() - lastClickTime < 1000){
                 return;
             }
             lastClickTime = SystemClock.elapsedRealtime();
+
 
             EditText word1 = findViewById(R.id.word1);
             EditText word2 = findViewById(R.id.word2);
@@ -95,24 +101,37 @@ public class StartActivity extends AppCompatActivity {
             String word2Str = word2.getText().toString();
             if(gr.find(word1Str) == null || gr.find(word2Str) == null){
                 Toast.makeText(getApplicationContext(), "Words not supported!", Toast.LENGTH_SHORT).show();
-                return;
             }
-            if(word1Str.length() != word2Str.length()){
+            else if(word1Str.length() != word2Str.length()){
                 Toast.makeText(getApplicationContext(), "Enter two words of the same length!", Toast.LENGTH_SHORT).show();
             }
             else{
+                showWorking(true);
                 new GraphExecutor().findPath(gcb, word1Str, word2Str);
             }
         });
 
-        findViewById(R.id.random).setOnClickListener(view -> {
+        findViewById(R.id.play_random).setOnClickListener(view -> {
             if (SystemClock.elapsedRealtime() - lastClickTime < 1000){
                 return;
             }
+            showWorking(true);
             lastClickTime = SystemClock.elapsedRealtime();
             new GraphExecutor().findRandomPath(gcb);
         });
+    }
 
+    private void showWorking(boolean on) {
+        View v = findViewById(R.id.path_tv_working);
 
+        if (on) {
+            v.setVisibility(View.VISIBLE);
+            Animation a = AnimationUtils.loadAnimation(this, R.anim.blink_anim);
+            v.setAnimation(a);
+            v.animate();
+        } else {
+            v.setVisibility(View.INVISIBLE);
+            v.clearAnimation();
+        }
     }
 }
