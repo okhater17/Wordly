@@ -7,6 +7,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Dialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -14,6 +15,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.text.InputType;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -43,12 +45,15 @@ import java.util.concurrent.Executors;
 
 import javax.net.ssl.HttpsURLConnection;
 
+import kotlinx.coroutines.ObsoleteCoroutinesApi;
+
 public class GameActivity extends AppCompatActivity implements RecycleViewAdapter.ItemClickListener{
     ArrayList<String> path;
     ArrayList<String> guess;
     RecycleViewAdapter adapter;
     boolean userWin = false;
     int currentGuessPosition;
+    View rootView;
     HintImageExecutor hie = new HintImageExecutor();
 
     interface HintImageCallback {
@@ -60,13 +65,14 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
-        View rootView = findViewById(R.id.rl_root);
+        rootView = findViewById(R.id.rl_root);
 
         rootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE
                 | View.SYSTEM_UI_FLAG_FULLSCREEN
                 | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
 
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
@@ -194,16 +200,47 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                 else{
                     Toast.makeText(getApplicationContext(), "Wrong word!", Toast.LENGTH_SHORT).show();
                 }
+                rootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
             }
         });
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dialog.cancel();
+                rootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE
+                        | View.SYSTEM_UI_FLAG_FULLSCREEN
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                        | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+            }
+        });
+
+        // how to tell if dialog exited by back button https://stackoverflow.com/questions/49809495/detect-back-button-event-when-dialog-is-open
+        builder.setOnKeyListener(new Dialog.OnKeyListener() {
+            @Override
+            public boolean onKey(DialogInterface dialog, int keyCode,
+                                 KeyEvent event) {
+                if (keyCode == KeyEvent.KEYCODE_BACK) {
+                    dialog.cancel();
+                    rootView.setSystemUiVisibility(View.SYSTEM_UI_FLAG_IMMERSIVE
+                            | View.SYSTEM_UI_FLAG_FULLSCREEN
+                            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                            | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY);
+                }
+                return true;
             }
         });
 
         builder.show();
+
 
     }
 
