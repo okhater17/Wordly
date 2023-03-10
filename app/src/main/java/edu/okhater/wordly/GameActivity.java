@@ -269,10 +269,6 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     if (imageList.size() > 0) {
                         iv.setImageBitmap(imageList.get(new Random().nextInt(imageList.size())));
                     }
-                    else {
-                        iv.setImageResource(R.drawable.unable_to_fetch_image);
-                        Toast.makeText(getApplicationContext(), "Failed to download hint image :(", Toast.LENGTH_SHORT).show();
-                    }
                 }
             });
             try {
