@@ -278,6 +278,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     Thread.sleep(5000);
                 }
                 catch (InterruptedException ie) {
+                    // prof Novak said we can leave this empty
                 }
             }
         }
