@@ -166,6 +166,9 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
             finish();
             return;
         }
+        if (!guess.get(position).equals("")) {
+            return;
+        }
 
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Guess!");
