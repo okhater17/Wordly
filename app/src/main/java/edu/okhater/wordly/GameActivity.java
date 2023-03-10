@@ -278,7 +278,9 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
             try {
                 Cycle();
             } catch (InterruptedException e) {
-                throw new RuntimeException(e);
+                ImageView iv = (ImageView) findViewById(R.id.hint_image);
+                iv.setImageResource(R.drawable.unable_to_fetch_image);
+                Toast.makeText(getApplicationContext(), "Failed to download hint image :(", Toast.LENGTH_SHORT).show();
             }
         }
         //Cycle through the images
