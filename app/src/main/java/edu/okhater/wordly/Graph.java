@@ -43,6 +43,9 @@ public class Graph{
     public Graph(BufferedReader br) throws IOException {
         String line;
         while((line = br.readLine()) != null){
+            //No special characters and no capitals
+            line = line.replaceAll("[-+^]*", "");
+            line = line.toLowerCase();
             if(line.length() == 4){
                 this.add(line);
             }
