@@ -41,8 +41,11 @@ import java.sql.Array;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Random;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 import javax.net.ssl.HttpsURLConnection;
 
@@ -55,19 +58,23 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
     boolean userWin = false;
     int currentGuessPosition;
     View rootView;
-    ArrayList<Bitmap> imageList = new ArrayList<>();
+    ArrayList<Bitmap> imageList;
     HintImageExecutor hie = new HintImageExecutor();
 
     interface HintImageCallback {
-        void onComplete(Bitmap img);
+        void onComplete();
     }
 
     interface CycleImageCallback {
         void onComplete();
     }
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+
+
+
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_game);
 
@@ -128,6 +135,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
         }
         // using math for now as a test
         hie.fetch(hic, path.get(currentGuessPosition));
+
 
         rootView.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -253,13 +261,13 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
 
     HintImageCallback hic = new HintImageCallback() {
         @Override
-        public void onComplete(Bitmap img) {
+        public void onComplete() {
             runOnUiThread(new Runnable() {
                 @Override
                 public void run() {
                     ImageView iv = (ImageView) findViewById(R.id.hint_image);
-                    if (img != null) {
-                        iv.setImageBitmap(img);
+                    if (imageList.size() > 0) {
+                        iv.setImageBitmap(imageList.get(new Random().nextInt(imageList.size())));
                     }
                     else {
                         iv.setImageResource(R.drawable.unable_to_fetch_image);
@@ -267,6 +275,23 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     }
                 }
             });
+            try {
+                Cycle();
+            } catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        public void Cycle() throws InterruptedException {
+            while(!userWin){
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        ImageView iv = (ImageView) findViewById(R.id.hint_image);
+                        iv.setImageBitmap(imageList.get(new Random().nextInt(imageList.size())));
+                    }
+                });
+                Thread.sleep(5000);
+            }
         }
     };
 
@@ -285,7 +310,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                         iv.setImageResource(R.drawable.fetching_image);
                         // help with pixaby https://www.youtube.com/watch?v=iOd86bj41hs
                         Log.d("Search Word", searchWord);
-                        URL url = new URL("https://pixabay.com/api/?key=34235580-57f7f2b3914a36555e74d2720&q=" + searchWord +"&image_type=photo&pretty=true");
+                        URL url = new URL("https://pixabay.com/api/?key=34235580-57f7f2b3914a36555e74d2720&q=" + searchWord + "&image_type=photo&pretty=true");
 
                         // get info from pixaby
                         con = (HttpsURLConnection) url.openConnection();
@@ -301,32 +326,38 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                         // get image url
                         JSONObject jsonImages = new JSONObject(data.toString());
                         JSONArray jsonArray = jsonImages.getJSONArray("hits");
-                        JSONObject jsonObject = jsonArray.getJSONObject(0);
-                        URL imageUrl = new URL((String) jsonObject.getString("previewURL"));
+                        imageList = new ArrayList<>();
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            URL imageUrl = new URL((String) jsonObject.getString("previewURL"));
 
-                        // convert to image
-                        InputStream inStream = new BufferedInputStream(imageUrl.openStream());
-                        ByteArrayOutputStream out = new ByteArrayOutputStream();
-                        byte[] buf = new byte[1024];
-                        int n = 0;
-                        while (-1 != (n= inStream.read(buf))) {
-                            out.write(buf, 0, n);
+                            // convert to image
+                            InputStream inStream = new BufferedInputStream(imageUrl.openStream());
+                            ByteArrayOutputStream out = new ByteArrayOutputStream();
+                            byte[] buf = new byte[1024];
+                            int n = 0;
+                            while (-1 != (n = inStream.read(buf))) {
+                                out.write(buf, 0, n);
+                            }
+                            out.close();
+                            inStream.close();
+
+                            byte[] response = out.toByteArray();
+                            img = BitmapFactory.decodeByteArray(response, 0, response.length);
+                            imageList.add(img);
                         }
-                        out.close();
-                        inStream.close();
 
-                        byte[] response = out.toByteArray();
-                        img = BitmapFactory.decodeByteArray(response, 0, response.length);
-
-                    } catch (IOException | JSONException e) {
-                        e.printStackTrace();
+                        } catch(IOException | JSONException e){
+                            e.printStackTrace();
+                        }
+                    hic.onComplete();
                     }
 
-                    hic.onComplete(img);
-                }
             });
         }
     }
+
+
 //    HintImageCallback hic = new HintImageCallback() {
 //        @Override
 //        public void onComplete() {
