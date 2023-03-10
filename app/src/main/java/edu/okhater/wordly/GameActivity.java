@@ -126,6 +126,8 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
             currentGuessPosition = 1;
         }
         // using math for now as a test
+        ImageView iv = (ImageView) findViewById(R.id.hint_image);
+        iv.setImageResource(R.drawable.fetching_image);
         hie.fetch(hic, path.get(currentGuessPosition));
 
 
@@ -145,21 +147,15 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                 if (userWin) {
                     finish();
                 }
-                // find first box not answered
-                for (int wordIdx = 1; wordIdx < path.size(); wordIdx++) {
-                    if (!path.get(wordIdx).equals(guess.get(wordIdx).toLowerCase())) {
-                        // find the different character
-                        for (int charIdx = 0; charIdx < path.get(wordIdx).length(); charIdx++) {
-                            // compare current word to word before it
-                            if (path.get(wordIdx).charAt(charIdx) != path.get(wordIdx - 1).charAt(charIdx)) {
-                                Toast.makeText(getApplicationContext(), String.valueOf(path.get(wordIdx).charAt(charIdx)), Toast.LENGTH_SHORT).show();
-                                break;
-                            }
-                        }
+
+                // find the different character
+                for (int charIdx = 0; charIdx < path.get(currentGuessPosition).length(); charIdx++) {
+                    // compare current word to word before it
+                    if (path.get(currentGuessPosition).charAt(charIdx) != path.get(currentGuessPosition-1).charAt(charIdx)) {
+                        Toast.makeText(getApplicationContext(), String.valueOf(path.get(currentGuessPosition).charAt(charIdx)), Toast.LENGTH_SHORT).show();
                         break;
                     }
                 }
-
             }
         });
 
@@ -179,17 +175,29 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
 // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
+        builder.setCancelable(false);
 
 // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(path.get(position).equals(input.getText().toString().toLowerCase())){
-                    // update image
-                    hie.fetch(hic, path.get(position + 1));
-
+                if(path.get(position).equals(input.getText().toString().toLowerCase().trim())){
                     guess.set(position, path.get(position));
                     adapter.notifyDataSetChanged();
+
+                    // update image
+                    ImageView iv = (ImageView) findViewById(R.id.hint_image);
+                    iv.setImageResource(R.drawable.fetching_image);
+
+                    // fetch the correct image. If the user answers the guesses out of order this is important to show the left most unguessed word
+                    for (int wordIdx = 1; wordIdx < path.size(); wordIdx++) {
+                        if (guess.get(wordIdx).equals("")) {
+                            currentGuessPosition = wordIdx;
+                            break;
+                        }
+                    }
+                    hie.fetch(hic, path.get(currentGuessPosition));
+
                     if (path.equals(guess)) {
                         userWin = true;
                         ImageView hintImage = (ImageView) findViewById(R.id.hint_image);
@@ -257,25 +265,28 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     }
                 }
             });
-            try {
-                Cycle();
-            } catch (InterruptedException e) {
-                ImageView iv = (ImageView) findViewById(R.id.hint_image);
-                iv.setImageResource(R.drawable.unable_to_fetch_image);
-                Toast.makeText(getApplicationContext(), "Failed to download hint image :(", Toast.LENGTH_SHORT).show();
-            }
+            Cycle();
+
         }
         //Cycle through the images
-        public void Cycle() throws InterruptedException {
+        public void Cycle() {
             while(!userWin){
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        Log.d("HERE", imageList.toString());
                         ImageView iv = (ImageView) findViewById(R.id.hint_image);
-                        iv.setImageBitmap(imageList.get(new Random().nextInt(imageList.size())));
+                        if (imageList.size() > 0) {
+                            iv.setImageBitmap(imageList.get(new Random().nextInt(imageList.size())));
+                        }
                     }
                 });
-                Thread.sleep(5000);
+                try {
+                    Thread.sleep(5000);
+                }
+                catch (InterruptedException ie) {
+                    // prof Novak said we can leave this empty
+                }
             }
         }
     };
@@ -291,8 +302,6 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     HttpsURLConnection con = null;
                     Bitmap img = null;
                     try {
-                        ImageView iv = (ImageView) findViewById(R.id.hint_image);
-                        iv.setImageResource(R.drawable.fetching_image);
                         // help with pixaby https://www.youtube.com/watch?v=iOd86bj41hs
                         Log.d("Search Word", searchWord);
                         URL url = new URL("https://pixabay.com/api/?key=34235580-57f7f2b3914a36555e74d2720&q=" + searchWord + "&image_type=photo&pretty=true");
