@@ -181,7 +181,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                if(path.get(position).equals(input.getText().toString().toLowerCase())){
+                if(path.get(position).equals(input.getText().toString().toLowerCase().trim())){
                     guess.set(position, path.get(position));
                     adapter.notifyDataSetChanged();
 

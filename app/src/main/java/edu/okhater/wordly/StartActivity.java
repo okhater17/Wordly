@@ -140,8 +140,8 @@ public class StartActivity extends AppCompatActivity {
 
             EditText word1 = findViewById(R.id.word1);
             EditText word2 = findViewById(R.id.word2);
-            String word1Str = word1.getText().toString().toLowerCase();
-            String word2Str = word2.getText().toString().toLowerCase();
+            String word1Str = word1.getText().toString().toLowerCase().trim();
+            String word2Str = word2.getText().toString().toLowerCase().trim();
             if(gr.find(word1Str) == null || gr.find(word2Str) == null){
                 Toast.makeText(getApplicationContext(), "Words not supported!", Toast.LENGTH_SHORT).show();
             }
