@@ -58,7 +58,13 @@ public class StartActivity extends AppCompatActivity {
             es.execute(new Runnable() {
                 @Override
                 public void run() {
-                    ArrayList<String>s = gr.findPath(word1, word2);
+                    ArrayList<String> s = null;
+                    try {
+                        s = gr.findPath(word1, word2);
+                    }
+                    catch (OutOfMemoryError ome) {
+                        Toast.makeText(getApplicationContext(), "Game too large!", Toast.LENGTH_SHORT).show();
+                    }
                     gcb.onComplete(s);
                 }
             });
