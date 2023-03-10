@@ -124,7 +124,7 @@ public class StartActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
 
-        Log.d("StartActivity", String.valueOf(gr==null));
+//        Log.d("StartActivity", String.valueOf(gr==null));
         if (gr == null) {
             showWorking(true);
             new GraphBuilderExecutor().buildGraph(gbcb);

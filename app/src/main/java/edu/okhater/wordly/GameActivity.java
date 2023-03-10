@@ -88,7 +88,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
         if(i != null) {
             path = (ArrayList<String>) i.getSerializableExtra("path");
         }
-        Log.d("CPS", path.toString());
+//        Log.d("CPS", path.toString());
         RecyclerView recyclerView = findViewById(R.id.list);
         LinearLayoutManager horizontalLayoutManager
                 = new LinearLayoutManager(GameActivity.this, LinearLayoutManager.HORIZONTAL, false);
@@ -263,6 +263,10 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     if (imageList.size() > 0) {
                         iv.setImageBitmap(imageList.get(new Random().nextInt(imageList.size())));
                     }
+                    else {
+                        iv.setImageResource(R.drawable.unable_to_fetch_image);
+                        Toast.makeText(getApplicationContext(), "Unable to fetch images!", Toast.LENGTH_SHORT).show();
+                    }
                 }
             });
             Cycle();
@@ -274,7 +278,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.d("HERE", imageList.toString());
+//                        Log.d("HERE", imageList.toString());
                         ImageView iv = (ImageView) findViewById(R.id.hint_image);
                         if (imageList.size() > 0) {
                             iv.setImageBitmap(imageList.get(new Random().nextInt(imageList.size())));
@@ -303,7 +307,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     Bitmap img = null;
                     try {
                         // help with pixaby https://www.youtube.com/watch?v=iOd86bj41hs
-                        Log.d("Search Word", searchWord);
+//                        Log.d("Search Word", searchWord);
                         URL url = new URL("https://pixabay.com/api/?key=34235580-57f7f2b3914a36555e74d2720&q=" + searchWord + "&image_type=photo&pretty=true");
 
                         // get info from pixaby
