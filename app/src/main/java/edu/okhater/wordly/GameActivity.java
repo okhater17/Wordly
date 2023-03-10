@@ -147,21 +147,15 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                 if (userWin) {
                     finish();
                 }
-                // find first box not answered
-                for (int wordIdx = 1; wordIdx < path.size(); wordIdx++) {
-                    if (!path.get(wordIdx).equals(guess.get(wordIdx).toLowerCase())) {
-                        // find the different character
-                        for (int charIdx = 0; charIdx < path.get(wordIdx).length(); charIdx++) {
-                            // compare current word to word before it
-                            if (path.get(wordIdx).charAt(charIdx) != path.get(wordIdx - 1).charAt(charIdx)) {
-                                Toast.makeText(getApplicationContext(), String.valueOf(path.get(wordIdx).charAt(charIdx)), Toast.LENGTH_SHORT).show();
-                                break;
-                            }
-                        }
+
+                // find the different character
+                for (int charIdx = 0; charIdx < path.get(currentGuessPosition).length(); charIdx++) {
+                    // compare current word to word before it
+                    if (path.get(currentGuessPosition).charAt(charIdx) != path.get(currentGuessPosition-1).charAt(charIdx)) {
+                        Toast.makeText(getApplicationContext(), String.valueOf(path.get(currentGuessPosition).charAt(charIdx)), Toast.LENGTH_SHORT).show();
                         break;
                     }
                 }
-
             }
         });
 
@@ -188,13 +182,22 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(path.get(position).equals(input.getText().toString().toLowerCase())){
+                    guess.set(position, path.get(position));
+                    adapter.notifyDataSetChanged();
+
                     // update image
                     ImageView iv = (ImageView) findViewById(R.id.hint_image);
                     iv.setImageResource(R.drawable.fetching_image);
-                    hie.fetch(hic, path.get(position + 1));
 
-                    guess.set(position, path.get(position));
-                    adapter.notifyDataSetChanged();
+                    // fetch the correct image. If the user answers the guesses out of order this is important to show the left most unguessed word
+                    for (int wordIdx = 1; wordIdx < path.size(); wordIdx++) {
+                        if (guess.get(wordIdx).equals("")) {
+                            currentGuessPosition = wordIdx;
+                            break;
+                        }
+                    }
+                    hie.fetch(hic, path.get(currentGuessPosition));
+
                     if (path.equals(guess)) {
                         userWin = true;
                         ImageView hintImage = (ImageView) findViewById(R.id.hint_image);
