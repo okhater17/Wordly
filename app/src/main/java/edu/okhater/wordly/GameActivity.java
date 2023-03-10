@@ -182,6 +182,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 if(path.get(position).equals(input.getText().toString().toLowerCase().trim())){
+                    imageList = new ArrayList<>();
                     guess.set(position, path.get(position));
                     adapter.notifyDataSetChanged();
 
@@ -281,9 +282,10 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     @Override
                     public void run() {
 //                        Log.d("HERE", imageList.toString());
-                        ImageView iv = (ImageView) findViewById(R.id.hint_image);
-                        iv.setImageBitmap(imageList.get(new Random().nextInt(imageList.size())));
-
+                        if (imageList.size() > 0) {
+                            ImageView iv = (ImageView) findViewById(R.id.hint_image);
+                            iv.setImageBitmap(imageList.get(new Random().nextInt(imageList.size())));
+                        }
                     }
                 });
                 try {
