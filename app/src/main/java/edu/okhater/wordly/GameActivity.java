@@ -278,9 +278,8 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     public void run() {
                         Log.d("HERE", imageList.toString());
                         ImageView iv = (ImageView) findViewById(R.id.hint_image);
-                        if (imageList.size() > 0) {
-                            iv.setImageBitmap(imageList.get(new Random().nextInt(imageList.size())));
-                        }
+                        iv.setImageBitmap(imageList.get(new Random().nextInt(imageList.size())));
+
                     }
                 });
                 try {
