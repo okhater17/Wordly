@@ -265,7 +265,9 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     }
                 }
             });
-            Cycle();
+            if(imageList.size() > 0) {
+                Cycle();
+            }
 
         }
         //Cycle through the images
