@@ -126,6 +126,8 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
             currentGuessPosition = 1;
         }
         // using math for now as a test
+        ImageView iv = (ImageView) findViewById(R.id.hint_image);
+        iv.setImageResource(R.drawable.fetching_image);
         hie.fetch(hic, path.get(currentGuessPosition));
 
 
@@ -187,6 +189,8 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
             public void onClick(DialogInterface dialog, int which) {
                 if(path.get(position).equals(input.getText().toString().toLowerCase())){
                     // update image
+                    ImageView iv = (ImageView) findViewById(R.id.hint_image);
+                    iv.setImageResource(R.drawable.fetching_image);
                     hie.fetch(hic, path.get(position + 1));
 
                     guess.set(position, path.get(position));
@@ -295,8 +299,6 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     HttpsURLConnection con = null;
                     Bitmap img = null;
                     try {
-                        ImageView iv = (ImageView) findViewById(R.id.hint_image);
-                        iv.setImageResource(R.drawable.fetching_image);
                         // help with pixaby https://www.youtube.com/watch?v=iOd86bj41hs
                         Log.d("Search Word", searchWord);
                         URL url = new URL("https://pixabay.com/api/?key=34235580-57f7f2b3914a36555e74d2720&q=" + searchWord + "&image_type=photo&pretty=true");
