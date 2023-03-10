@@ -179,6 +179,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
 // Specify the type of input expected; this, for example, sets the input as a password, and will mask the text
         input.setInputType(InputType.TYPE_CLASS_TEXT);
         builder.setView(input);
+        builder.setCancelable(false);
 
 // Set up the buttons
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -257,25 +258,27 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
                     }
                 }
             });
-            try {
-                Cycle();
-            } catch (InterruptedException e) {
-                ImageView iv = (ImageView) findViewById(R.id.hint_image);
-                iv.setImageResource(R.drawable.unable_to_fetch_image);
-                Toast.makeText(getApplicationContext(), "Failed to download hint image :(", Toast.LENGTH_SHORT).show();
-            }
+            Cycle();
+
         }
         //Cycle through the images
-        public void Cycle() throws InterruptedException {
+        public void Cycle() {
             while(!userWin){
                 runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
+                        Log.d("HERE", imageList.toString());
                         ImageView iv = (ImageView) findViewById(R.id.hint_image);
-                        iv.setImageBitmap(imageList.get(new Random().nextInt(imageList.size())));
+                        if (imageList.size() > 0) {
+                            iv.setImageBitmap(imageList.get(new Random().nextInt(imageList.size())));
+                        }
                     }
                 });
-                Thread.sleep(5000);
+                try {
+                    Thread.sleep(5000);
+                }
+                catch (InterruptedException ie) {
+                }
             }
         }
     };

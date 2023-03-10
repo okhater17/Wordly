@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import android.os.SystemClock;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
@@ -23,7 +24,8 @@ import java.util.concurrent.Executors;
 public class StartActivity extends AppCompatActivity {
     BufferedReader reader;
     long lastClickTime = 0;
-    Graph gr;
+    static Graph gr;
+    boolean makingGraph = false;
     interface GraphCallBack{
         void onComplete(ArrayList<String> s);
     }
@@ -81,21 +83,56 @@ public class StartActivity extends AppCompatActivity {
         }
     }
 
+
+    interface GraphBuilderCallback{
+        void onComplete();
+    }
+    GraphBuilderCallback gbcb = new GraphBuilderCallback() {
+        @Override
+        public void onComplete() {
+            runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    showWorking(false);
+                }
+            });
+
+        }
+    };
+    public class GraphBuilderExecutor{
+        public void buildGraph(GraphBuilderCallback gbcb){
+            ExecutorService es = Executors.newFixedThreadPool(1);
+            es.execute(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        reader = new BufferedReader(
+                                new InputStreamReader(getAssets().open("words_unix.txt")));
+                        gr = new Graph(reader);
+
+                    } catch (IOException e) {
+                        Toast.makeText(getApplicationContext(), "Could not create game graph. Restart game.", Toast.LENGTH_SHORT).show();
+                    }
+                    gbcb.onComplete();
+                }
+            });
+        }
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_start);
-        try {
-            reader = new BufferedReader(
-                    new InputStreamReader(getAssets().open("words_unix.txt")));
-            gr = new Graph(reader);
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+
+        Log.d("StartActivity", String.valueOf(gr==null));
+        if (gr == null) {
+            showWorking(true);
+            new GraphBuilderExecutor().buildGraph(gbcb);
         }
 
         // prevent double clicking play game button https://stackoverflow.com/questions/5608720/android-preventing-double-click-on-a-button
         findViewById(R.id.play_custom).setOnClickListener(view -> {
-            if (SystemClock.elapsedRealtime() - lastClickTime < 1000){
+            if (makingGraph | SystemClock.elapsedRealtime() - lastClickTime < 1000){
                 return;
             }
             lastClickTime = SystemClock.elapsedRealtime();
@@ -103,8 +140,8 @@ public class StartActivity extends AppCompatActivity {
 
             EditText word1 = findViewById(R.id.word1);
             EditText word2 = findViewById(R.id.word2);
-            String word1Str = word1.getText().toString();
-            String word2Str = word2.getText().toString();
+            String word1Str = word1.getText().toString().toLowerCase();
+            String word2Str = word2.getText().toString().toLowerCase();
             if(gr.find(word1Str) == null || gr.find(word2Str) == null){
                 Toast.makeText(getApplicationContext(), "Words not supported!", Toast.LENGTH_SHORT).show();
             }
@@ -118,7 +155,7 @@ public class StartActivity extends AppCompatActivity {
         });
 
         findViewById(R.id.play_random).setOnClickListener(view -> {
-            if (SystemClock.elapsedRealtime() - lastClickTime < 1000){
+            if (makingGraph | SystemClock.elapsedRealtime() - lastClickTime < 1000){
                 return;
             }
             showWorking(true);
@@ -131,13 +168,16 @@ public class StartActivity extends AppCompatActivity {
         View v = findViewById(R.id.path_tv_working);
 
         if (on) {
+            makingGraph = true;
             v.setVisibility(View.VISIBLE);
             Animation a = AnimationUtils.loadAnimation(this, R.anim.blink_anim);
             v.setAnimation(a);
             v.animate();
         } else {
+            makingGraph = false;
             v.setVisibility(View.INVISIBLE);
             v.clearAnimation();
         }
     }
+
 }
