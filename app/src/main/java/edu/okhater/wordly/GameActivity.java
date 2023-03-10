@@ -58,7 +58,7 @@ public class GameActivity extends AppCompatActivity implements RecycleViewAdapte
     boolean userWin = false;
     int currentGuessPosition;
     View rootView;
-    ArrayList<Bitmap> imageList;
+    ArrayList<Bitmap> imageList = new ArrayList<>();
     HintImageExecutor hie = new HintImageExecutor();
 
     interface HintImageCallback {
